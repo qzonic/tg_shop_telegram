@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from logging.handlers import RotatingFileHandler
 
 from aiogram import Dispatcher, Bot
 from aiogram.types import BotCommand
@@ -10,7 +11,11 @@ from handlers.bot_commands import bot_commands
 
 
 async def main() -> None:
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(
+        format='%(asctime)s, %(levelname)s, %(message)s',
+        level=logging.INFO,
+        handlers=[RotatingFileHandler('bot.log', maxBytes=5000000, backupCount=5)]
+    )
 
     commands_for_bot = []
     for cmd in bot_commands.keys():
@@ -22,7 +27,6 @@ async def main() -> None:
     dp = Dispatcher()
     bot = Bot(token=config.TELEGRAM_TOKEN)
     await bot.set_my_commands(commands=commands_for_bot)
-
     register_user_commands(dp)
 
     await dp.start_polling(bot)
